@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: ./kompose convert --out yamls
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: postgres
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: postgres
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: ./kompose convert --out yamls
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/docker-compose-to-kubernetes-default: "true"
+        io.kompose.service: postgres
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: "psql_password"
+            - name: POSTGRES_USER
+              value: "psql_user"
+          image: postgres:latest
+          name: postgres
+          ports:
+            - containerPort: 5432
+              hostPort: 5432
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "100Mi"
+            limits:
+              cpu: "100m"
+              memory: "256Mi"
+      restartPolicy: Always
